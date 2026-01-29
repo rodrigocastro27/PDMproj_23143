@@ -10,6 +10,7 @@ A BookBox é uma aplicação móvel dedicada à gestão de bibliotecas pessoais 
 # Estrutura do Projeto
 
 ipca.example.bookbox/
+
 ├── api/                        
 │   ├── data/                   
 │   ├── APIModule.kt            
@@ -102,13 +103,16 @@ A aplicação foi construída seguindo as práticas lecionadas durante a discipl
 
 1. Implementação do Padrão MVVM
 - A principal dificuldade consistiu em garantir uma separação clara entre a lógica de dados e a interface. A gestão de estados reativos no Jetpack Compose exigiu especial atenção para assegurar que a interface refletia corretamente o    estado do ViewModel sem perda de informação durante as recomposições.
+  
 2. Navegação e Passagem de Dados
 - A navegação entre ecrãs revelou-se desafiante, sobretudo na passagem de múltiplos argumentos. Foi necessário recorrer à codificação de URLs e à configuração de navArguments para garantir a transmissão correta de dados entre páginas, evitando chamadas desnecessárias à API.
+  
 3. Estabilidade da Aplicação
 - A integração com o Firebase e uma API externa trouxe desafios relacionados com a consistência dos dados. A implementação de validações adicionais foi essencial para prevenir falhas da aplicação e garantir uma experiência de utilização estável.
 
 # Conclusão
 
-O desenvolvimento da BookBox permitiu-me consolidar os conhecimentos lecionados na disciplina, ao mesmo tempo que despertou um maior interesse por esta área da programação. A transição para uma interface totalmente declarativa com Jetpack Compose, aliada à utilização de um backend em tempo real como o Firebase, resultou numa aplicação robusta que cumpre os objetivos propostos de interoperabilidade e portabilidade.
+O desenvolvimento da BookBox permitiu-me consolidar os conhecimentos lecionados na disciplina, ao mesmo tempo que despertou um maior interesse por esta área da programação. 
+A transição para uma interface totalmente declarativa com Jetpack Compose, aliada à utilização de um backend em tempo real como o Firebase, resultou numa aplicação robusta que cumpre os objetivos propostos de interoperabilidade e portabilidade.
 
 
