@@ -9,8 +9,8 @@ A BookBox é uma aplicação móvel dedicada à gestão de bibliotecas pessoais 
 
 # Estrutura do Projeto
 
+```estrutura
 ipca.example.bookbox/
-
 ├── api/                        
 │   ├── data/                   
 │   ├── APIModule.kt            
@@ -39,6 +39,7 @@ ipca.example.bookbox/
 ├── BookboxApp.kt               
 ├── FirebaseModule.kt          
 └── MainActivity.kt             
+```
 
 api/ -  Responsável pela comunicação com a Google Books API, contendo as configurações do Retrofit e definições de endpoints.
 
