@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "725675752525",
+    "project_id": "bookbox-334c8",
+    "storage_bucket": "bookbox-334c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725675752525:android:913124358ae7d07c92f004",
+        "android_client_info": {
+          "package_name": "ipca.example.bookbox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlMo5J0-XNLI_GqSQ0uKhSzEE_uAv49tM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
