@@ -69,4 +69,8 @@ class AuthenticationRepository @Inject constructor(
             emit(ResultWrapper.Error(e.localizedMessage ?: "Error sending link"))
         }
     }.flowOn(Dispatchers.IO)
+
+    fun signOut(){
+        auth.signOut()
+    }
 }

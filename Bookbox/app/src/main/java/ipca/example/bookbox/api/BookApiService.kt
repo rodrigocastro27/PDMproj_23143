@@ -8,6 +8,6 @@ interface BookApiService {
     suspend fun searchBooks(
         @Query("q") query: String,
         @Query("maxResults") maxResults: Int = 100,
-        @Query("key") apiKey: String = "AIzaSyCPR_uyIYSzMdVL8u5h5f71Uw80j9ny-Hw"
+        @Query("key") apiKey: String = "AIzaSyDh3EZjbU6DNaACOMV8D4l4dbaw7PnkNiA"
     ): GoogleBooks
 }

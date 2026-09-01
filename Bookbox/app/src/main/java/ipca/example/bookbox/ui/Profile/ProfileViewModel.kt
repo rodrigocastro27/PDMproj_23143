@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ipca.example.bookbox.models.book.Book
 import ipca.example.bookbox.models.review.Review
 import ipca.example.bookbox.repository.ProfileRepository
+import ipca.example.bookbox.repository.AuthenticationRepository
 import ipca.example.bookbox.repository.ResultWrapper
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: ProfileRepository
+    private val repository: ProfileRepository,
+    private val authRepository : AuthenticationRepository
 ) : ViewModel() {
 
 
@@ -134,5 +136,9 @@ class ProfileViewModel @Inject constructor(
 
     fun resetSuccess() {
         _uiState.value = _uiState.value.copy(isSuccess = false)
+    }
+
+    fun signOut() {
+        authRepository.signOut()
     }
 }

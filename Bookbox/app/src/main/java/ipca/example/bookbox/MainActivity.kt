@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = "login"
                     ) {
-                        // --- Ecrãs de Autenticação ---
+
                         composable("login") {
                             isAuthScreen = true
                             LoginView(navController)

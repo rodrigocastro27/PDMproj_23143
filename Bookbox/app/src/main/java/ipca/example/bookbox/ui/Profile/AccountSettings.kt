@@ -131,6 +131,21 @@ fun AccountSettingsView(navController: NavController) {
                 Text("Update Account")
             }
 
+            Spacer(Modifier.height(24.dp))
+
+            OutlinedButton(
+                onClick = {
+                    viewModel.signOut()
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Log Out")
+            }
+
             Spacer(modifier = Modifier.weight(1f))
             Spacer(modifier = Modifier.height(32.dp))
 
