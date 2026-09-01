@@ -58,7 +58,7 @@ fun ProfileView(navController: NavController) {
                 }
             )
         },
-        bottomBar = { MyBottomBar(navController, "profile") }
+        bottomBar = { MyBottomBar(navController) }
     ) { padding ->
         Column(
             modifier = Modifier

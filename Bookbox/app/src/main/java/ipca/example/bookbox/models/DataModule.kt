@@ -1,11 +1,6 @@
 package ipca.example.bookbox.models
 
 import android.content.Context
-import ipca.example.bookbox.models.book.BookDao
-import ipca.example.bookbox.models.user.UserDao
-import ipca.example.bookbox.models.review.ReviewDao
-import ipca.example.bookbox.models.wishlistitem.WishlistItemDao
-import ipca.example.bookbox.models.progress.ProgressDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

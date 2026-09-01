@@ -6,16 +6,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import ipca.example.bookbox.models.book.Book
-import ipca.example.bookbox.models.book.BookDao
-import ipca.example.bookbox.models.progress.ProgressDao
 import ipca.example.bookbox.models.progress.Progress
 import ipca.example.bookbox.models.user.User
-import ipca.example.bookbox.models.user.UserDao
 import ipca.example.bookbox.models.wishlistitem.WishlistItem
-import ipca.example.bookbox.models.wishlistitem.WishlistItemDao
 import ipca.example.bookbox.models.review.Review
-import ipca.example.bookbox.models.review.ReviewDao
-
 
 
 @Database(

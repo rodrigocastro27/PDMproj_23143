@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import ipca.example.bookbox.api.data.BookApiService
 import ipca.example.bookbox.api.data.BookItem
 import ipca.example.bookbox.models.book.Book
+import ipca.example.bookbox.models.book.BookDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,23 +18,25 @@ import javax.inject.Singleton
 @Singleton
 class BookRepository @Inject constructor(
     private val apiService: BookApiService,
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val bookDao: BookDao
 ) {
     fun fetchExploreBooks(query: String): Flow<ResultWrapper<List<Book>>> = flow {
-        try {
-            emit(ResultWrapper.Loading())
-            val response = apiService.searchBooks(query = query, maxResults = 20)
-            val books = response.items?.map { it.toBook() } ?: emptyList()
-            emit(ResultWrapper.Success(books))
-        } catch (e: Exception) {
-            emit(ResultWrapper.Error(e.localizedMessage ?: "API Error"))
-        }
-    }.flowOn(Dispatchers.IO)
+    try {
+        emit(ResultWrapper.Loading())
+        val response = apiService.searchBooks(query = query, maxResults = 50)
+        val books = response.items?.map { it.toBook() } ?: emptyList()
+        emit(ResultWrapper.Success(books))
+    } catch (e: Exception) {
+        emit(ResultWrapper.Error(e.localizedMessage ?: "API Error"))
+    }
+}.flowOn(Dispatchers.IO)
 
     fun fetchUserBooks(): Flow<ResultWrapper<List<Book>>> = flow {
+        val currentUserId = Firebase.auth.currentUser?.uid
         try {
             emit(ResultWrapper.Loading())
-            val currentUserId = Firebase.auth.currentUser?.uid ?: throw Exception("User not logged in")
+            if (currentUserId == null) throw Exception("User not logged in")
             db.collection("books")
                 .whereEqualTo("createdBy", currentUserId)
                 .snapshotFlow()
@@ -41,10 +44,16 @@ class BookRepository @Inject constructor(
                     val books = snapshot.documents.mapNotNull { doc ->
                         doc.toObject(Book::class.java)?.apply { if (bookid.isEmpty()) bookid = doc.id }
                     }
+                    books.forEach { bookDao.insertBook(it) }
                     emit(ResultWrapper.Success(books))
                 }
         } catch (e: Exception) {
-            emit(ResultWrapper.Error(e.localizedMessage ?: "Firestore Error"))
+            val cached = currentUserId?.let { bookDao.getBooksByUser(it) } ?: emptyList()
+            if (cached.isNotEmpty()) {
+                emit(ResultWrapper.Success(cached))
+            } else {
+                emit(ResultWrapper.Error(e.localizedMessage ?: "Firestore Error"))
+            }
         }
     }.flowOn(Dispatchers.IO)
 
@@ -55,6 +64,7 @@ class BookRepository @Inject constructor(
             val finalId = book.bookid.ifEmpty { db.collection("books").document().id }
             val bookToSave = book.copy(bookid = finalId, createdBy = userId, isManual = true)
             db.collection("books").document(finalId).set(bookToSave).await()
+            bookDao.insertBook(bookToSave)
             emit(ResultWrapper.Success(Unit))
         } catch (e: Exception) {
             emit(ResultWrapper.Error(e.localizedMessage ?: "Error Saving"))
@@ -65,6 +75,7 @@ class BookRepository @Inject constructor(
         try {
             emit(ResultWrapper.Loading())
             db.collection("books").document(bookId).delete().await()
+            bookDao.getBookById(bookId)?.let { bookDao.deleteBook(it) }
             emit(ResultWrapper.Success(Unit))
         } catch (e: Exception) {
             emit(ResultWrapper.Error(e.localizedMessage ?: "Error Deleting"))
@@ -74,7 +85,9 @@ class BookRepository @Inject constructor(
     suspend fun getBookById(bookId: String): Book? {
         return try {
             db.collection("books").document(bookId).get().await().toObject(Book::class.java)
-        } catch (e: Exception) { null }
+        } catch (e: Exception) {
+            bookDao.getBookById(bookId)
+        }
     }
 
     fun addToWishlist(book: Book): Flow<ResultWrapper<Unit>> = flow {

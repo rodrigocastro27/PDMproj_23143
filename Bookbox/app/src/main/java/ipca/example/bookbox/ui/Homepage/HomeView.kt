@@ -32,7 +32,7 @@ fun HomeView(navController: NavController) {
                 title = { Text("BookBox", fontWeight = FontWeight.Bold) }
             )
         },
-        bottomBar = { MyBottomBar(navController, "home") }
+        bottomBar = { MyBottomBar(navController) }
     ) { padding ->
         LazyColumn(
             modifier = Modifier

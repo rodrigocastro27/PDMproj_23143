@@ -32,7 +32,7 @@ fun InProgressView(navController: NavController) {
         topBar = {
             CenterAlignedTopAppBar(title = { Text("Reading Progress", fontWeight = FontWeight.Bold) })
         },
-        bottomBar = { MyBottomBar(navController, "inprogress") }
+        bottomBar = { MyBottomBar(navController) }
     ) { padding ->
 
         if (uiState.booksInProgress.isEmpty() && !uiState.isLoading) {

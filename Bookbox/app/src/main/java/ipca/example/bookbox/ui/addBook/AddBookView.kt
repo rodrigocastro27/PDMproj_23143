@@ -20,7 +20,7 @@ fun AddBookView(navController: NavController) {
     val uiState by homeViewModel.uiState
 
     Scaffold(
-        bottomBar = { MyBottomBar(navController, "add") }
+        bottomBar = { MyBottomBar(navController) }
     ) { padding ->
         Column(
             modifier = Modifier

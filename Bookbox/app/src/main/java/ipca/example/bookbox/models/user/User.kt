@@ -1,7 +1,11 @@
 package ipca.example.bookbox.models.user
 
+import androidx.room.Dao
 import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
+import androidx.room.Query
 
 @Entity(tableName = "users")
 data class User(
@@ -15,3 +19,12 @@ data class User(
     var email: String = "",
     var bio: String? = null
 )
+
+@Dao
+interface UserDao {
+    @Query("SELECT * FROM users WHERE userid = :id")
+    suspend fun getUserById(id: String): User?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUser(user: User)
+}
