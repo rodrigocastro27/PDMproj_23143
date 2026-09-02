@@ -5,7 +5,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
@@ -17,12 +16,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-
+import ipca.example.bookbox.ui.components.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountSettingsView(navController: NavController) {
+fun AccountSettingsView(navController: NavController, modifier: Modifier = Modifier) {
 
-    val viewModel: ProfileViewModel = hiltViewModel()
+    val viewModel: AccountSettingsViewModel = hiltViewModel()
     val uiState by viewModel.uiState
 
 
@@ -43,21 +42,9 @@ fun AccountSettingsView(navController: NavController) {
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Account Settings") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+
         Column(
             modifier = Modifier
-                .padding(padding)
                 .padding(16.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
@@ -135,9 +122,8 @@ fun AccountSettingsView(navController: NavController) {
 
             OutlinedButton(
                 onClick = {
-                    viewModel.signOut()
-                    navController.navigate("login") {
-                        popUpTo(0) { inclusive = true }
+                    viewModel.signOut{
+                        navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -149,7 +135,7 @@ fun AccountSettingsView(navController: NavController) {
             Spacer(modifier = Modifier.weight(1f))
             Spacer(modifier = Modifier.height(32.dp))
 
-            // ÁREA DE PERIGO (Account Status)
+
             Text(
                 text = "Account Status",
                 style = MaterialTheme.typography.titleMedium,
@@ -167,7 +153,7 @@ fun AccountSettingsView(navController: NavController) {
                 onClick = {
                     viewModel.deleteUserAccount {
 
-                        navController.navigate("login") {
+                        navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
                     }
@@ -181,5 +167,4 @@ fun AccountSettingsView(navController: NavController) {
                 Text("Delete Account Permanently", color = Color.White)
             }
         }
-    }
 }

@@ -29,7 +29,7 @@ class ProfileRepository @Inject constructor(
     private val bookDao: BookDao
 ) {
 
-    fun fetchProfile(uid: String?): Flow<ResultWrapper<User>> = flow {
+    fun fetchProfile(uid: String): Flow<ResultWrapper<User>> = flow {
         try {
             emit(ResultWrapper.Loading())
             db.collection("users").document(uid).snapshotFlow().collect { snapshot ->

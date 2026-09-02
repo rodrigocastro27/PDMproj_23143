@@ -26,9 +26,10 @@ fun MakeReviewView(
     bookId: String,
     bookTitle: String,
     bookAuthor: String,
-    bookCover: String
+    bookCover: String,
+    modifier: Modifier = Modifier
 ) {
-    val viewModel: ProfileViewModel = hiltViewModel()
+    val viewModel: MakeReviewViewModel = hiltViewModel()
     val uiState by viewModel.uiState
 
 
@@ -48,26 +49,11 @@ fun MakeReviewView(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            viewModel.resetSuccess()
             navController.popBackStack()
         }
     }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Make a Review") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
                 .padding(16.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
@@ -107,7 +93,7 @@ fun MakeReviewView(
             Button(
                 onClick = {
                     viewModel.addReview(
-                        bookId = bookId,
+                        bookid = bookId,
                         title = decodedTitle,
                         author = decodedAuthor,
                         cover = decodedCover,
@@ -134,4 +120,3 @@ fun MakeReviewView(
             }
         }
     }
-}

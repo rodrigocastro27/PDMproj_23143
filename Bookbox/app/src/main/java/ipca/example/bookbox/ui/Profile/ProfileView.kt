@@ -2,6 +2,7 @@ package ipca.example.bookbox.ui.Profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -29,44 +30,37 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import ipca.example.bookbox.models.Review
 import ipca.example.bookbox.ui.Homepage.BookItem
-import ipca.example.bookbox.ui.Progress.ProgressViewModel
-import ipca.example.bookbox.ui.components.MyBottomBar
-import java.net.URLEncoder
+import ipca.example.bookbox.ui.components.Screen
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun ProfileView(navController: NavController) {
+fun ProfileView(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel: ProfileViewModel = hiltViewModel()
-    val progressViewModel: ProgressViewModel = hiltViewModel()
     val uiState by viewModel.uiState
     var selectedTab by remember { mutableStateOf("reviews") }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("@${uiState.userProfile.username ?: "user"}") }, // Acesso seguro
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigate("edit_profile") }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit Profile")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { navController.navigate("account_settings") }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    }
-                }
-            )
-        },
-        bottomBar = { MyBottomBar(navController) }
-    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.navigate(Screen.EditProfile.route) }) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit Profile")
+                }
+                Text(
+                    text = "@${uiState.userProfile.username ?: "user"}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                IconButton(onClick = { navController.navigate(Screen.AccountSettings.route) }) {
+                    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                }
+            }
 
             AsyncImage(
                 model = uiState.userProfile.photoUrl ?: R.drawable.default_avatar,
@@ -147,23 +141,21 @@ fun ProfileView(navController: NavController) {
                                 isMyBook = false,
                                 onAddToWishlist = {  },
                                 onAddToProgress = {
-                                    progressViewModel.updateBookProgress(book, 0, "")
+                                    viewModel.addToProgress(book)
                                 },
                                 onMakeReview = {
-                                    val eTitle = URLEncoder.encode(book.title ?: "", "UTF-8")
-                                    val eAuthor = URLEncoder.encode(book.author ?: "", "UTF-8")
-                                    val eCover = URLEncoder.encode(book.coverUrl ?: "", "UTF-8")
-                                    navController.navigate("make_review/${book.bookid}/$eTitle/$eAuthor/$eCover")
+                                    navController.navigate(Screen.MakeReview.createRoute(book.bookid, book.title ?: "", book.author ?: "", book.coverUrl ?: "" ))
                                 },
-                                onClick = { navController.navigate("book_details/${book.bookid}") }
+                                onClick = { navController.navigate(Screen.BookDetails.createRoute(book.bookid))
+                                }
                             )
                         }
                     }
                 }
             }
         }
-    }
 }
+
 
 @Composable
 fun ReviewCard(review: Review) {

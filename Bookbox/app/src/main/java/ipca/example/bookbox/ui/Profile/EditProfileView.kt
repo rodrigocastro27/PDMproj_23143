@@ -27,7 +27,7 @@ import ipca.example.bookbox.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileView(navController: NavController) {
-    val viewModel: ProfileViewModel = hiltViewModel()
+    val viewModel: EditProfileViewModel = hiltViewModel()
     val uiState by viewModel.uiState
 
     var firstName by remember { mutableStateOf("") }
@@ -45,25 +45,12 @@ fun EditProfileView(navController: NavController) {
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            viewModel.resetSuccess()
             navController.popBackStack()
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Edit Profile") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { padding ->
         Column(
-            modifier = Modifier.padding(padding).padding(16.dp).fillMaxSize(),
+            modifier = Modifier.padding(16.dp).fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -90,5 +77,4 @@ fun EditProfileView(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF536396))
             ) { Text("Update", color = Color.White) }
         }
-    }
 }

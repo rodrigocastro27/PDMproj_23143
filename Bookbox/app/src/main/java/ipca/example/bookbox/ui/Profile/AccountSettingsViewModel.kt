@@ -34,11 +34,20 @@ class AccountSettingsViewModel @Inject constructor(
 
 
     init {
-        currentUid.let { uid ->
+        currentUid?.let { uid ->
             repository.fetchProfile(uid).onEach { result ->
                 if (result is ResultWrapper.Success) _uiState.value =
                     _uiState.value.copy(userProfile = result.data!!)
             }.launchIn(viewModelScope)
+        }
+    }
+
+    fun updateAccountSettings(newUsername: String, newEmail: String){
+        currentUid?.let { uid ->
+            repository.updateAccountSettings(uid, newUsername, newEmail).onEach { result ->
+                if (result is ResultWrapper.Success) _uiState.value = _uiState.value.copy(isSuccess = true )
+            }.launchIn(viewModelScope)
+
         }
     }
 
