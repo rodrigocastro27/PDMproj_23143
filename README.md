@@ -4,12 +4,12 @@ Este relatório visa apresentar a arquitetura e o processo de desenvolvimento do
 
 A ideia da BookBox surgiu da minha admiração pela aplicação **Letterboxd** e do meu interesse pessoal pela leitura. A Letterboxd permite aos utilizadores criar e partilhar reviews de filmes, promovendo uma comunidade ativa em torno do cinema. Inspirado nesse conceito, procurei desenvolver um projeto semelhante, adaptado ao universo literário e numa escala mais reduzida.
 
-A BookBox é uma aplicação móvel dedicada à gestão de bibliotecas pessoais e à monitorização de hábitos de leitura, permitindo aos seus utilizadores encontrar novos livros, acompanhar o seu progresso de leitura e registar as suas reviews.
+A BookBox é uma aplicação móvel dedicada à gestão de bibliotecas pessoais e à monitorização de hábitos de leitura, permitindo aos seus utilizadores encontrar novos livros, acompanhar o seu progresso de leitura, registar as reviews e adicionar livros que desejam na sua wishlist.
 
 
 # Estrutura do Projeto
 
-\`\`\`estrutura
+```estrutura
 ipca.example.bookbox/
 ├── api/
 │   ├── data/
@@ -44,7 +44,7 @@ ipca.example.bookbox/
 ├── BookboxApp.kt
 ├── FirebaseModule.kt
 └── MainActivity.kt
-\`\`\`
+```
 
 api/ - Responsável pela comunicação com a Google Books API, contendo as configurações do Retrofit e definições de endpoints.
 
@@ -57,6 +57,7 @@ ui/ - UI da Aplicação, Jetpack Compose. Cada ecrã tem o seu próprio ViewMode
 `ui/components/Screen.kt` - Define todas as rotas de navegação como tipo (`sealed class`), evitando strings soltas espalhadas pelo código.
 
 .Module - Responsável pela implementação da injeção de dependências através do Hilt, garantindo o desacoplamento entre componentes e facilitando a testabilidade da aplicação.
+
 
 # Funcionalidades
 
@@ -71,20 +72,6 @@ A aplicação oferece um conjunto vasto de ferramentas para o utilizador usufrui
 - **Reading Progress**: Acompanhamento do progresso de leitura associado a cada livro, incluindo um espaço destinado ao registo de observações pessoais.
 
 - **Wishlist & Reviews**: Funcionalidade que permite adicionar livros a uma wishlist e registar reviews relativas a livros já concluídos.# Funcionalidades
-
-A aplicação oferece um conjunto vasto de ferramentas para o utilizador usufruir:
-
-- **Autenticação**: Registo, Login (via Email ou Username) e Logout, integrados com a Firebase Auth. A sessão é persistida, saltando o ecrã de login em acessos seguintes.
-
-- **Catálogo de livros**: Pesquisa em tempo real de livros através de integração com a Google Books API.
-
-- **Biblioteca Pessoal**: Criação, edição e remoção de livros inseridos manualmente pelo utilizador.
-
-- **Reading Progress**: Acompanhamento do progresso de leitura associado a cada livro, incluindo um espaço destinado ao registo de observações pessoais.
-
-- **Wishlist & Reviews**: Funcionalidade que permite adicionar livros a uma wishlist e registar reviews relativas a livros já concluídos.
-
-- **Acesso offline**: Livros, perfil, reviews e wishlist ficam disponíveis mesmo sem ligação à internet, através de uma cache local em Room, atualizada sempre que há dados novos vindos do Firestore.
 
 
 # Modelo de Dados
@@ -123,17 +110,19 @@ A aplicação foi construída seguindo as práticas lecionadas durante a discipl
 # Dificuldades
 
 1. Implementação do Padrão MVVM
-- A principal dificuldade consistiu em garantir uma separação clara entre a lógica de dados e a interface. A gestão de estados reativos no Jetpack Compose exigiu especial atenção para assegurar que a interface refletia corretamente o    estado do ViewModel sem perda de informação durante as recomposições.
-  
+- A principal dificuldade consistiu em garantir uma separação clara entre a lógica de dados e a interface. A gestão de estados reativos no Jetpack Compose exigiu especial atenção para assegurar que a interface refletia corretamente o estado do ViewModel sem perda de informação durante as recomposições.
+
 2. Navegação e Passagem de Dados
 - A navegação entre ecrãs revelou-se desafiante, sobretudo na passagem de múltiplos argumentos. Foi necessário recorrer à codificação de URLs e à configuração de navArguments para garantir a transmissão correta de dados entre páginas, evitando chamadas desnecessárias à API.
-  
+
 3. Estabilidade da Aplicação
-- A integração com o Firebase e uma API externa trouxe desafios relacionados com a consistência dos dados. A implementação de validações adicionais foi essencial para prevenir falhas da aplicação e garantir uma experiência de utilização estável.
+- A integração com o Firebase e com uma API externa trouxe desafios relacionados com a consistência dos dados, sobretudo em cenários sem rede. Foi necessário garantir que uma falha de ligação nunca deixava a aplicação num estado inconsistente ou a fechar sozinha, com tratamento de erro em cada leitura e escrita, e uma cópia local dos dados guardada para esses casos.
+
 
 # Conclusão
 
-O desenvolvimento da BookBox permitiu-me consolidar os conhecimentos lecionados na disciplina, ao mesmo tempo que despertou um maior interesse por esta área da programação. 
-A transição para uma interface totalmente declarativa com Jetpack Compose, aliada à utilização de um backend em tempo real como o Firebase, resultou numa aplicação robusta que cumpre os objetivos propostos de interoperabilidade e portabilidade.
+O desenvolvimento da BookBox permitiu-me consolidar os conhecimentos lecionados na disciplina, ao mesmo tempo que despertou um maior interesse por esta área da programação. A transição para uma interface totalmente declarativa com Jetpack Compose, aliada à utilização de um backend em tempo real como o Firebase e de uma cache local em Room, resultou numa aplicação robusta que cumpre os objetivos propostos de interoperabilidade e portabilidade.
+
+A revisão feita depois da avaliação inicial acabou por ser a parte mais formativa do trabalho. As críticas do relatório do professor, o Room implementado mas nunca usado, os ViewModels partilhados sem necessidade entre ecrãs, as rotas em texto solto, obrigaram-me a voltar ao código já feito e a perceber, a sério, porque é que os padrões ensinados na disciplina existem, e não só a aplicá-los de forma mecânica. Fica o meu agradecimento ao professor por essas críticas terem sido concretas o suficiente para se poder trabalhar em cima delas.
 
 
