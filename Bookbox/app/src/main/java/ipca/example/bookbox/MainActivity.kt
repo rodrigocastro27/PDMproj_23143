@@ -23,6 +23,7 @@ import ipca.example.bookbox.ui.Authentication.RegisterView
 import ipca.example.bookbox.ui.addBook.AddBookView
 import ipca.example.bookbox.ui.addBook.CreateBookView
 import ipca.example.bookbox.ui.addBook.EditBookView
+import ipca.example.bookbox.ui.bookdetails.BookDetailView
 import ipca.example.bookbox.ui.Profile.ProfileView
 import ipca.example.bookbox.ui.components.MyBottomBar
 import ipca.example.bookbox.ui.components.Screen
@@ -33,7 +34,6 @@ import ipca.example.bookbox.ui.Homepage.HomeView
 import ipca.example.bookbox.ui.theme.BookboxTheme
 import ipca.example.bookbox.ui.Progress.InProgressView
 import ipca.example.bookbox.ui.Progress.UpdateProgressView
-import ipca.example.bookbox.ui.bookdetails.BookDetailView
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -43,16 +43,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-            var navTitle by remember { mutableStateOf("Bookbox") }
-            var isAuthScreen by remember { mutableStateOf(true) }
+            var navTitle by remember { mutableStateOf("BookBox") }
+            var showChrome by remember { mutableStateOf(false) }
             var showBackButton by remember { mutableStateOf(false) }
-            var hideGlobalTopBar by remember { mutableStateOf(false) }
 
             BookboxTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        if (!isAuthScreen && !hideGlobalTopBar) {
+                        if (showChrome) {
                             TopAppBar(
                                 title = { Text(navTitle) },
                                 navigationIcon = {
@@ -64,6 +63,11 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+                    },
+                    bottomBar = {
+                        if (showChrome && !showBackButton) {
+                            MyBottomBar(navController)
+                        }
                     }
                 ) { innerPadding ->
                     NavHost(
@@ -71,94 +75,67 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Screen.Login.route
                     ) {
-
                         composable(Screen.Login.route) {
-                            isAuthScreen = true
+                            showChrome = false
                             LoginView(navController)
                         }
                         composable(Screen.Register.route) {
-                            isAuthScreen = true
+                            showChrome = false
                             RegisterView(navController)
                         }
                         composable(Screen.ForgotPassword.route) {
-                            isAuthScreen = true
+                            showChrome = false
                             ForgotPasswordView(navController)
                         }
-
-                       //After Entering the App
                         composable(Screen.Home.route) {
-                            navTitle = "Home"
-                            isAuthScreen = false
-                            showBackButton = false
-                            hideGlobalTopBar = false
+                            navTitle = "BookBox"; showChrome = true; showBackButton = false
                             HomeView(navController)
                         }
                         composable(Screen.AddBook.route) {
-                            navTitle = "Add Book"
-                            isAuthScreen = false
-                            showBackButton = false
-                            hideGlobalTopBar = false
+                            navTitle = "Add Book"; showChrome = true; showBackButton = false
                             AddBookView(navController)
                         }
                         composable(Screen.InProgress.route) {
-                            navTitle = "Reading Progress"
-                            isAuthScreen = false
-                            showBackButton = false
-                            hideGlobalTopBar = false
+                            navTitle = "Reading Progress"; showChrome = true; showBackButton = false
                             InProgressView(navController)
                         }
-
                         composable(
                             route = Screen.UpdateProgress.route,
                             arguments = listOf(navArgument("bookId") { type = NavType.StringType })
                         ) { backStackEntry ->
-                            navTitle = "Upgrade Progress"
+                            navTitle = "Update Progress"; showChrome = true; showBackButton = true
                             UpdateProgressView(navController, backStackEntry.arguments?.getString("bookId") ?: "")
                         }
-
                         composable(Screen.Profile.route) {
-                            isAuthScreen = false
-                            hideGlobalTopBar = true
+                            navTitle = "Profile"; showChrome = true; showBackButton = false
                             ProfileView(navController)
                         }
-
                         composable(
                             route = Screen.BookDetails.route,
                             arguments = listOf(navArgument("bookId") { type = NavType.StringType })
                         ) { backStackEntry ->
-                            navTitle = "Book Details"
+                            navTitle = "Book Details"; showChrome = true; showBackButton = true
                             BookDetailView(navController, backStackEntry.arguments?.getString("bookId") ?: "")
                         }
-
                         composable(Screen.CreateBook.route) {
-                            isAuthScreen = false
-                            hideGlobalTopBar = true
+                            navTitle = "Add Book"; showChrome = true; showBackButton = true
                             CreateBookView(navController)
                         }
-
                         composable(
                             route = Screen.EditBook.route,
                             arguments = listOf(navArgument("bookId") { type = NavType.StringType })
                         ) { backStackEntry ->
-                            val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
-                            isAuthScreen = false
-                            hideGlobalTopBar = true
-                            EditBookView(navController, bookId)
+                            navTitle = "Edit Book"; showChrome = true; showBackButton = true
+                            EditBookView(navController, backStackEntry.arguments?.getString("bookId") ?: "")
                         }
-
                         composable(Screen.EditProfile.route) {
-                            isAuthScreen = false
-                            hideGlobalTopBar = true
+                            navTitle = "Edit Profile"; showChrome = true; showBackButton = true
                             EditProfileView(navController)
                         }
-
                         composable(Screen.AccountSettings.route) {
-                            isAuthScreen = false
-                            hideGlobalTopBar = true
+                            navTitle = "Account Settings"; showChrome = true; showBackButton = true
                             AccountSettingsView(navController)
                         }
-
-
                         composable(
                             route = Screen.MakeReview.route,
                             arguments = listOf(
@@ -168,7 +145,7 @@ class MainActivity : ComponentActivity() {
                                 navArgument("bookCover") { type = NavType.StringType }
                             )
                         ) { backStackEntry ->
-                            navTitle = "Write a Review";
+                            navTitle = "Write a Review"; showChrome = true; showBackButton = true
                             MakeReviewView(
                                 navController = navController,
                                 bookId = backStackEntry.arguments?.getString("bookId") ?: "",
@@ -176,7 +153,6 @@ class MainActivity : ComponentActivity() {
                                 bookAuthor = backStackEntry.arguments?.getString("bookAuthor") ?: "",
                                 bookCover = backStackEntry.arguments?.getString("bookCover") ?: ""
                             )
-
                         }
                     }
                 }

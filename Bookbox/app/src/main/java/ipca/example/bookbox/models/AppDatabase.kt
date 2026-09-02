@@ -13,7 +13,7 @@ import androidx.room.RoomDatabase
         WishlistItem::class,
         Review::class
     ],
-    version = 1
+    version = 2
 )
 abstract class AppDatabase: RoomDatabase() {
 
