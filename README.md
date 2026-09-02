@@ -9,48 +9,54 @@ A BookBox é uma aplicação móvel dedicada à gestão de bibliotecas pessoais 
 
 # Estrutura do Projeto
 
-```estrutura
+\`\`\`estrutura
 ipca.example.bookbox/
-├── api/                        
-│   ├── data/                   
-│   ├── APIModule.kt            
-│   └── BookApiService.kt       
-├── models/                     
-│   ├── book/                  
-│   ├── progress/               
-│   ├── review/                 
-│   ├── user/                  
-│   ├── wishlistitem/          
-│   ├── AppDatabase.kt         
-│   └── DataModule.kt          
-├── repository/                 
+├── api/
+│   ├── data/
+│   ├── APIModule.kt
+│   └── BookApiService.kt
+├── models/
+│   ├── AppDatabase.kt
+│   ├── DataModule.kt
+│   ├── Book.kt
+│   ├── Progress.kt
+│   ├── Review.kt
+│   ├── User.kt
+│   └── WishlistItem.kt
+├── repository/
 │   ├── AuthenticationRepository.kt
 │   ├── BookRepository.kt
+│   ├── ProfileRepository.kt
 │   ├── ProgressRepository.kt
-│   └── ResultWrapper.kt       
-├── ui/                         
-│   ├── addBook/                
-│   ├── Authentication/         
-│   ├── components/             
-│   ├── Homepage/               
-│   ├── Profile/               
-│   ├── Progress/             
-│   └── theme/                  
-├── BookboxApp.kt               
-├── FirebaseModule.kt          
-└── MainActivity.kt             
-```
+│   ├── RepositoryHelpers.kt
+│   └── ResultWrapper.kt
+├── ui/
+│   ├── addBook/
+│   ├── Authentication/
+│   ├── bookdetails/
+│   ├── components/
+│   │   ├── MyBottomBar.kt
+│   │   └── Screen.kt
+│   ├── Homepage/
+│   ├── Profile/
+│   ├── Progress/
+│   └── theme/
+├── BookboxApp.kt
+├── FirebaseModule.kt
+└── MainActivity.kt
+\`\`\`
 
-api/ -  Responsável pela comunicação com a Google Books API, contendo as configurações do Retrofit e definições de endpoints.
+api/ - Responsável pela comunicação com a Google Books API, contendo as configurações do Retrofit e definições de endpoints.
 
-models/ - Define as entidades da Data Access Layer e a estrutura da database local.
+models/ - Define as entidades da Data Access Layer (cada ficheiro junta a `@Entity` e o respetivo `@Dao`) e a estrutura da base de dados local, gerida pelo Room (`AppDatabase.kt`).
 
-repository/ - Atua como a "Single Source of Truth", mediando o flow de dados entre a API, a Firebase e a database local.
+repository/ - Atua como a única fonte de verdade (Single Source of Truth) entre o Firestore e a base de dados local: cada leitura tenta primeiro o Firestore e grava o resultado no Room como cache; se o Firestore falhar, a leitura recorre à cópia local já guardada. Isto garante que livros, perfil, reviews e wishlist continuam acessíveis mesmo sem rede, desde que já tenham sido carregados uma vez com ligação.
 
-ui/ - UI da Aplicação, Jetpack Compose.
+ui/ - UI da Aplicação, Jetpack Compose. Cada ecrã tem o seu próprio ViewModel, exceto onde os dados são genuinamente partilhados (por exemplo, `CreateBook` e `EditBook` são o mesmo formulário em dois estados).
+
+`ui/components/Screen.kt` - Define todas as rotas de navegação como tipo (`sealed class`), evitando strings soltas espalhadas pelo código.
 
 .Module - Responsável pela implementação da injeção de dependências através do Hilt, garantindo o desacoplamento entre componentes e facilitando a testabilidade da aplicação.
-
 
 # Funcionalidades
 
@@ -64,7 +70,21 @@ A aplicação oferece um conjunto vasto de ferramentas para o utilizador usufrui
 
 - **Reading Progress**: Acompanhamento do progresso de leitura associado a cada livro, incluindo um espaço destinado ao registo de observações pessoais.
 
+- **Wishlist & Reviews**: Funcionalidade que permite adicionar livros a uma wishlist e registar reviews relativas a livros já concluídos.# Funcionalidades
+
+A aplicação oferece um conjunto vasto de ferramentas para o utilizador usufruir:
+
+- **Autenticação**: Registo, Login (via Email ou Username) e Logout, integrados com a Firebase Auth. A sessão é persistida, saltando o ecrã de login em acessos seguintes.
+
+- **Catálogo de livros**: Pesquisa em tempo real de livros através de integração com a Google Books API.
+
+- **Biblioteca Pessoal**: Criação, edição e remoção de livros inseridos manualmente pelo utilizador.
+
+- **Reading Progress**: Acompanhamento do progresso de leitura associado a cada livro, incluindo um espaço destinado ao registo de observações pessoais.
+
 - **Wishlist & Reviews**: Funcionalidade que permite adicionar livros a uma wishlist e registar reviews relativas a livros já concluídos.
+
+- **Acesso offline**: Livros, perfil, reviews e wishlist ficam disponíveis mesmo sem ligação à internet, através de uma cache local em Room, atualizada sempre que há dados novos vindos do Firestore.
 
 
 # Modelo de Dados
