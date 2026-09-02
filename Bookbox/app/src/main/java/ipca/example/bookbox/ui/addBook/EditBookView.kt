@@ -123,6 +123,15 @@ fun EditBookView(
                         Text("Update Book Information")
                     }
 
+                    TextButton(
+                        onClick = { viewModel.deleteBook(bookId) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
+                    ) {
+                        Text("Delete Book")
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
             }
 
