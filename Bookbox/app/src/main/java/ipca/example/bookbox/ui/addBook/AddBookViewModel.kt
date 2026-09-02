@@ -21,7 +21,8 @@ data class AddBookState(
     var coverUrl: String = "",
     var isLoading: Boolean = false,
     var isSuccess: Boolean = false,
-    var error: String? = null
+    var error: String? = null,
+    var userBooks: List<Book> = emptyList()
 )
 
 @HiltViewModel
@@ -32,6 +33,18 @@ class AddBookViewModel @Inject constructor(
     var uiState = mutableStateOf(AddBookState())
         private set
 
+    fun fetchUserBooks() {
+        repository.fetchUserBooks().onEach { result ->
+            when (result) {
+                is ResultWrapper.Loading -> uiState.value = uiState.value.copy(isLoading = true)
+                is ResultWrapper.Success -> uiState.value = uiState.value.copy(
+                    userBooks = result.data ?: emptyList(),
+                    isLoading = false
+                )
+                is ResultWrapper.Error -> uiState.value = uiState.value.copy(isLoading = false, error = result.message )
+            }
+        }.launchIn(viewModelScope)
+    }
 
     fun onTitleChange(new: String) { uiState.value = uiState.value.copy(title = new) }
     fun onAuthorChange(new: String) { uiState.value = uiState.value.copy(author = new) }

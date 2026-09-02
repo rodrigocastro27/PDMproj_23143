@@ -4,10 +4,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ipca.example.bookbox.models.Book
+import ipca.example.bookbox.repository.AuthenticationRepository
 import ipca.example.bookbox.repository.ProgressRepository
 import ipca.example.bookbox.repository.ResultWrapper
 import kotlinx.coroutines.flow.launchIn
@@ -23,13 +22,14 @@ data class ProgressViewState(
 
 @HiltViewModel
 class ProgressViewModel @Inject constructor(
-    private val repository: ProgressRepository
+    private val repository: ProgressRepository,
+    private val authrepository : AuthenticationRepository
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf(ProgressViewState())
     val uiState: State<ProgressViewState> = _uiState
 
-    private val uid = Firebase.auth.currentUser?.uid ?: ""
+    private val uid = authrepository.getCurrentUid() ?: ""
 
     init {
         if (uid.isNotEmpty()) loadProgress()

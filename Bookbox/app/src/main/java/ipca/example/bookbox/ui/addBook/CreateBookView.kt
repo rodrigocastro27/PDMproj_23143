@@ -1,5 +1,6 @@
 package ipca.example.bookbox.ui.addBook
 
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -9,7 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,17 +23,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun CreateBookView(navController: NavController) {
+fun CreateBookView(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel: AddBookViewModel = hiltViewModel()
     val uiState by viewModel.uiState
-
 
     val photoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let { viewModel.onCoverUrlChange(it.toString()) }
     }
-
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -42,21 +40,9 @@ fun CreateBookView(navController: NavController) {
         }
     }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Create Book") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                    }
-                }
-            )
-        }
-    ) { padding ->
+
         Column(
             modifier = Modifier
-                .padding(padding)
                 .padding(16.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
@@ -136,5 +122,4 @@ fun CreateBookView(navController: NavController) {
                 Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
             }
         }
-    }
 }

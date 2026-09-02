@@ -9,26 +9,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import ipca.example.bookbox.ui.Homepage.HomeViewModel
-import ipca.example.bookbox.ui.components.MyBottomBar
 import ipca.example.bookbox.ui.Homepage.BookItem
 import ipca.example.bookbox.ui.Homepage.SectionHeader
+import ipca.example.bookbox.ui.components.Screen
 
 @Composable
 fun AddBookView(navController: NavController) {
-    val homeViewModel: HomeViewModel = hiltViewModel()
-    val uiState by homeViewModel.uiState
+    val viewModel: AddBookViewModel = hiltViewModel()
+    val uiState by viewModel.uiState
 
-    Scaffold(
-        bottomBar = { MyBottomBar(navController) }
-    ) { padding ->
+    LaunchedEffect(Unit) {
+        viewModel.fetchUserBooks()
+    }
         Column(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
         ) {
             Button(
-                onClick = { navController.navigate("create_book") },
+                onClick = { navController.navigate(Screen.CreateBook.route) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
@@ -52,11 +50,10 @@ fun AddBookView(navController: NavController) {
                         onMakeReview = {  },
                         onClick = {
 
-                            navController.navigate("edit_book/${book.bookid}")
+                            navController.navigate(Screen.EditBook.createRoute(book.bookid))
                         }
                     )
                 }
             }
         }
-    }
 }

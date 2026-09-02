@@ -20,20 +20,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import ipca.example.bookbox.models.Book
-import ipca.example.bookbox.ui.components.MyBottomBar
+import ipca.example.bookbox.ui.components.Screen
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun InProgressView(navController: NavController) {
+fun InProgressView(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel: ProgressViewModel = hiltViewModel()
     val uiState by viewModel.uiState
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(title = { Text("Reading Progress", fontWeight = FontWeight.Bold) })
-        },
-        bottomBar = { MyBottomBar(navController) }
-    ) { padding ->
 
         if (uiState.booksInProgress.isEmpty() && !uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -41,18 +35,17 @@ fun InProgressView(navController: NavController) {
             }
         } else {
             LazyColumn(
-                modifier = Modifier.padding(padding).fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(uiState.booksInProgress) { book ->
                     ProgressBookItem(book, onEdit = {
-                        navController.navigate("update_progress/${book.bookid}")
+                        navController.navigate(Screen.UpdateProgress.createRoute(book.bookid))
                     })
                 }
             }
         }
-    }
 }
 
 @Composable

@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,15 +17,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun UpdateProgressView(navController: NavController, bookId: String) {
+fun UpdateProgressView(navController: NavController, bookId: String, modifier: Modifier = Modifier) {
     val viewModel: ProgressViewModel = hiltViewModel()
     val uiState by viewModel.uiState
 
-
     val book = uiState.booksInProgress.find { it.bookid == bookId }
-
 
     var currentPage by remember { mutableStateOf("") }
     var totalPages by remember { mutableStateOf("") }
@@ -49,22 +46,9 @@ fun UpdateProgressView(navController: NavController, bookId: String) {
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Update Progress") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                    }
-                }
-            )
-        }
-    ) { padding ->
         book?.let { currentBook ->
             Column(
                 modifier = Modifier
-                    .padding(padding)
                     .padding(16.dp)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState()),
@@ -147,5 +131,4 @@ fun UpdateProgressView(navController: NavController, bookId: String) {
                 }
             }
         } ?: Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-    }
 }
