@@ -24,7 +24,7 @@ class BookRepository @Inject constructor(
     fun fetchExploreBooks(query: String): Flow<ResultWrapper<List<Book>>> = flow {
         try {
             emit(ResultWrapper.Loading())
-            val response = apiService.searchBooks(query = query, maxResults = 50)
+            val response = apiService.searchBooks(query = query, maxResults = 20)
             val books = response.items?.map { it.toBook() } ?: emptyList()
             emit(ResultWrapper.Success(books))
         } catch (e: Exception) {
