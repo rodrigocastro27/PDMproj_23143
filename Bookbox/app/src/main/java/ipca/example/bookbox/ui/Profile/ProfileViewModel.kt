@@ -7,13 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ipca.example.bookbox.models.book.Book
-import ipca.example.bookbox.models.review.Review
+import ipca.example.bookbox.models.Book
+import ipca.example.bookbox.models.Review
 import ipca.example.bookbox.repository.ProfileRepository
 import ipca.example.bookbox.repository.AuthenticationRepository
 import ipca.example.bookbox.repository.ResultWrapper
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,7 +67,7 @@ class ProfileViewModel @Inject constructor(
     fun addReview(bookId: String, title: String, author: String, cover: String, rating: Int, text: String) {
         val uid = currentUid ?: return
         val review = Review(
-            reviewid = java.util.UUID.randomUUID().toString(),
+            reviewid = UUID.randomUUID().toString(),
             userid = uid,
             bookid = bookId,
             bookTitle = title,
@@ -139,6 +140,6 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun signOut() {
-        authRepository.signOut()
+
     }
 }

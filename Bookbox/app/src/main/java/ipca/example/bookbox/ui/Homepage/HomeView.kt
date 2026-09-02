@@ -7,46 +7,28 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import ipca.example.bookbox.ui.Profile.ProfileViewModel
-import ipca.example.bookbox.ui.Progress.ProgressViewModel
-import ipca.example.bookbox.ui.components.MyBottomBar
-import java.net.URLEncoder
+import ipca.example.bookbox.ui.components.Screen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeView(navController: NavController) {
-    val homeViewModel: HomeViewModel = hiltViewModel()
-    val profileViewModel: ProfileViewModel = hiltViewModel()
-    val progressViewModel: ProgressViewModel = hiltViewModel()
+fun HomeView(navController: NavController, modifier: Modifier = Modifier) {
+    val viewModel: HomeViewModel = hiltViewModel()
+    val uiState by viewModel.uiState
 
-    val uiState by homeViewModel.uiState
-
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("BookBox", fontWeight = FontWeight.Bold) }
-            )
-        },
-        bottomBar = { MyBottomBar(navController) }
-    ) { padding ->
         LazyColumn(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
         ) {
-
             item {
                 SearchBarSection(
                     query = uiState.searchQuery,
-                    onQueryChange = { homeViewModel.onSearchQueryChange(it) }
+                    onQueryChange = { viewModel.onSearchQueryChange(it) }
                 )
             }
-
 
             item { SectionHeader("Explore New Books") }
             item {
@@ -58,15 +40,14 @@ fun HomeView(navController: NavController) {
                         BookItem(
                             book = book,
                             isMyBook = false,
-                            onAddToWishlist = { profileViewModel.addToWishlist(book) },
-                            onAddToProgress = { progressViewModel.updateBookProgress(book, 0, "") },
+                            onAddToWishlist = { viewModel.addToWishlist(book) },
+                            onAddToProgress = { viewModel.addToProgress(book) },
                             onMakeReview = {
-                                val eTitle = URLEncoder.encode(book.title ?: "", "UTF-8")
-                                val eAuthor = URLEncoder.encode(book.author ?: "", "UTF-8")
-                                val eCover = URLEncoder.encode(book.coverUrl ?: "", "UTF-8")
-                                navController.navigate("make_review/${book.bookid}/$eTitle/$eAuthor/$eCover")
+                                navController.navigate(
+                                    Screen.MakeReview.createRoute(book.bookid, book.title ?: "", book.author ?: "", book.coverUrl ?: "")
+                                )
                             },
-                            onClick = { navController.navigate("book_details/${book.bookid}") }
+                            onClick = { navController.navigate(Screen.BookDetails.createRoute(book.bookid)) }
                         )
                     }
                 }
@@ -83,16 +64,15 @@ fun HomeView(navController: NavController) {
                     items(uiState.filteredUserBooks) { book ->
                         BookItem(
                             book = book,
-                            isMyBook = true,
-                            onAddToWishlist = { profileViewModel.addToWishlist(book) },
-                            onAddToProgress = { progressViewModel.updateBookProgress(book, 0, "") },
+                            isMyBook = false,
+                            onAddToWishlist = { viewModel.addToWishlist(book) },
+                            onAddToProgress = { viewModel.addToProgress(book) },
                             onMakeReview = {
-                                val eTitle = URLEncoder.encode(book.title ?: "", "UTF-8")
-                                val eAuthor = URLEncoder.encode(book.author ?: "", "UTF-8")
-                                val eCover = URLEncoder.encode(book.coverUrl ?: "", "UTF-8")
-                                navController.navigate("make_review/${book.bookid}/$eTitle/$eAuthor/$eCover")
+                                navController.navigate(
+                                    Screen.MakeReview.createRoute(book.bookid, book.title ?: "", book.author ?: "", book.coverUrl ?: "")
+                                )
                             },
-                            onClick = { navController.navigate("edit_book/${book.bookid}") }
+                            onClick = { navController.navigate(Screen.EditBook.createRoute(book.bookid)) }
                         )
                     }
                 }
@@ -100,5 +80,4 @@ fun HomeView(navController: NavController) {
 
             item { Spacer(modifier = Modifier.height(16.dp)) }
         }
-    }
 }

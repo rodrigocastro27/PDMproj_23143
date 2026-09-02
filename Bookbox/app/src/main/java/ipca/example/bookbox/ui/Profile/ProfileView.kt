@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import ipca.example.bookbox.models.review.Review
+import ipca.example.bookbox.models.Review
 import ipca.example.bookbox.ui.Homepage.BookItem
 import ipca.example.bookbox.ui.Progress.ProgressViewModel
 import ipca.example.bookbox.ui.components.MyBottomBar

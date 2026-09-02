@@ -4,8 +4,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ipca.example.bookbox.models.book.Book
+import ipca.example.bookbox.models.Book
+import ipca.example.bookbox.repository.AuthenticationRepository
 import ipca.example.bookbox.repository.BookRepository
+import ipca.example.bookbox.repository.ProfileRepository
+import ipca.example.bookbox.repository.ProgressRepository
 import ipca.example.bookbox.repository.ResultWrapper
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -22,7 +25,10 @@ data class HomeViewState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val bookRepository: BookRepository
+    private val bookRepository: BookRepository,
+    private val profileRepository: ProfileRepository,
+    private val progressRepository: ProgressRepository,
+    private val authRepository: AuthenticationRepository
 ) : ViewModel() {
 
     var uiState = mutableStateOf(HomeViewState())
@@ -81,5 +87,15 @@ class HomeViewModel @Inject constructor(
                 is ResultWrapper.Error -> uiState.value = uiState.value.copy(isLoading = false, error = result.message)
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun addToWishlist (book: Book){
+        val uid = authRepository.getCurrentUid() ?: return
+        profileRepository.addToWishlist(uid, book).launchIn(viewModelScope)
+    }
+
+    fun addToProgress(book: Book) {
+        val uid = authRepository.getCurrentUid() ?: return
+        progressRepository.updateProgress(uid, book, 0, "").launchIn(viewModelScope)
     }
 }

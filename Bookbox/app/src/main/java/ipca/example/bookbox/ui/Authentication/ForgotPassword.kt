@@ -21,7 +21,7 @@ fun ForgotPasswordView(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: AuthenticationViewModel = hiltViewModel()
+    val viewModel: ForgotPasswordViewModel = hiltViewModel()
     val uiState by viewModel.uiState
 
 

@@ -1,4 +1,4 @@
-package ipca.example.bookbox.models.user
+package ipca.example.bookbox.models
 
 import androidx.room.Dao
 import androidx.room.Entity

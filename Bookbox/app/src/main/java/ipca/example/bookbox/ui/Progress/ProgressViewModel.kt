@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ipca.example.bookbox.models.book.Book
+import ipca.example.bookbox.models.Book
 import ipca.example.bookbox.repository.ProgressRepository
 import ipca.example.bookbox.repository.ResultWrapper
 import kotlinx.coroutines.flow.launchIn

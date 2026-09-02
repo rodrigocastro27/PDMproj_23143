@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import ipca.example.bookbox.models.book.Book
+import ipca.example.bookbox.models.Book
 
 @Composable
 fun BookItem(

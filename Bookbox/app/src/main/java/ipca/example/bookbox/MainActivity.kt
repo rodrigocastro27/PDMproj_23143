@@ -25,6 +25,7 @@ import ipca.example.bookbox.ui.addBook.CreateBookView
 import ipca.example.bookbox.ui.addBook.EditBookView
 import ipca.example.bookbox.ui.Profile.ProfileView
 import ipca.example.bookbox.ui.components.MyBottomBar
+import ipca.example.bookbox.ui.components.Screen
 import ipca.example.bookbox.ui.Profile.AccountSettingsView
 import ipca.example.bookbox.ui.Profile.EditProfileView
 import ipca.example.bookbox.ui.Profile.MakeReviewView
@@ -32,6 +33,7 @@ import ipca.example.bookbox.ui.Homepage.HomeView
 import ipca.example.bookbox.ui.theme.BookboxTheme
 import ipca.example.bookbox.ui.Progress.InProgressView
 import ipca.example.bookbox.ui.Progress.UpdateProgressView
+import ipca.example.bookbox.ui.bookdetails.BookDetailView
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -67,66 +69,75 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         modifier = Modifier.padding(innerPadding),
                         navController = navController,
-                        startDestination = "login"
+                        startDestination = Screen.Login.route
                     ) {
 
-                        composable("login") {
+                        composable(Screen.Login.route) {
                             isAuthScreen = true
                             LoginView(navController)
                         }
-                        composable("register") {
+                        composable(Screen.Register.route) {
                             isAuthScreen = true
                             RegisterView(navController)
                         }
-                        composable("forgot_password") {
+                        composable(Screen.ForgotPassword.route) {
                             isAuthScreen = true
                             ForgotPasswordView(navController)
                         }
 
-                        // --- Ecrãs Principais ---
-                        composable("home") {
+                       //After Entering the App
+                        composable(Screen.Home.route) {
                             navTitle = "Home"
                             isAuthScreen = false
                             showBackButton = false
                             hideGlobalTopBar = false
                             HomeView(navController)
                         }
-                        composable("add_book") {
+                        composable(Screen.AddBook.route) {
                             navTitle = "Add Book"
                             isAuthScreen = false
                             showBackButton = false
                             hideGlobalTopBar = false
                             AddBookView(navController)
                         }
-                        composable("inprogress") { // Antes estava "progress"
+                        composable(Screen.InProgress.route) {
                             navTitle = "Reading Progress"
                             isAuthScreen = false
                             showBackButton = false
                             hideGlobalTopBar = false
                             InProgressView(navController)
                         }
+
                         composable(
-                            route = "update_progress/{bookId}",
+                            route = Screen.UpdateProgress.route,
                             arguments = listOf(navArgument("bookId") { type = NavType.StringType })
                         ) { backStackEntry ->
-                            val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
-                            UpdateProgressView(navController, bookId)
+                            navTitle = "Upgrade Progress"
+                            UpdateProgressView(navController, backStackEntry.arguments?.getString("bookId") ?: "")
                         }
-                        composable("profile") {
+
+                        composable(Screen.Profile.route) {
                             isAuthScreen = false
                             hideGlobalTopBar = true
                             ProfileView(navController)
                         }
 
-                        // --- Fluxos Secundários ---
-                        composable("create_book") {
+                        composable(
+                            route = Screen.BookDetails.route,
+                            arguments = listOf(navArgument("bookId") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            navTitle = "Book Details"
+                            BookDetailView(navController, backStackEntry.arguments?.getString("bookId") ?: "")
+                        }
+
+                        composable(Screen.CreateBook.route) {
                             isAuthScreen = false
                             hideGlobalTopBar = true
                             CreateBookView(navController)
                         }
 
                         composable(
-                            route = "edit_book/{bookId}",
+                            route = Screen.EditBook.route,
                             arguments = listOf(navArgument("bookId") { type = NavType.StringType })
                         ) { backStackEntry ->
                             val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
@@ -135,13 +146,13 @@ class MainActivity : ComponentActivity() {
                             EditBookView(navController, bookId)
                         }
 
-                        composable("edit_profile") {
+                        composable(Screen.EditProfile.route) {
                             isAuthScreen = false
                             hideGlobalTopBar = true
                             EditProfileView(navController)
                         }
 
-                        composable("account_settings") {
+                        composable(Screen.AccountSettings.route) {
                             isAuthScreen = false
                             hideGlobalTopBar = true
                             AccountSettingsView(navController)
@@ -149,7 +160,7 @@ class MainActivity : ComponentActivity() {
 
 
                         composable(
-                            route = "make_review/{bookId}/{bookTitle}/{bookAuthor}/{bookCover}",
+                            route = Screen.MakeReview.route,
                             arguments = listOf(
                                 navArgument("bookId") { type = NavType.StringType },
                                 navArgument("bookTitle") { type = NavType.StringType },
@@ -157,18 +168,15 @@ class MainActivity : ComponentActivity() {
                                 navArgument("bookCover") { type = NavType.StringType }
                             )
                         ) { backStackEntry ->
-                            val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
-                            val bookTitle = backStackEntry.arguments?.getString("bookTitle") ?: ""
-                            val bookAuthor = backStackEntry.arguments?.getString("bookAuthor") ?: ""
-                            val bookCover = backStackEntry.arguments?.getString("bookCover") ?: ""
-
+                            navTitle = "Write a Review";
                             MakeReviewView(
                                 navController = navController,
-                                bookId = bookId,
-                                bookTitle = bookTitle,
-                                bookAuthor = bookAuthor,
-                                bookCover = bookCover
+                                bookId = backStackEntry.arguments?.getString("bookId") ?: "",
+                                bookTitle = backStackEntry.arguments?.getString("bookTitle") ?: "",
+                                bookAuthor = backStackEntry.arguments?.getString("bookAuthor") ?: "",
+                                bookCover = backStackEntry.arguments?.getString("bookCover") ?: ""
                             )
+
                         }
                     }
                 }

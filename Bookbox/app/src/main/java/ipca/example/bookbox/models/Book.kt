@@ -1,4 +1,4 @@
-package ipca.example.bookbox.models.book
+package ipca.example.bookbox.models
 
 import androidx.room.Dao
 import androidx.room.Delete

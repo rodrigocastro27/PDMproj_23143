@@ -1,8 +1,8 @@
 package ipca.example.bookbox.ui.Profile
 
-import ipca.example.bookbox.models.book.Book
-import ipca.example.bookbox.models.review.Review
-import ipca.example.bookbox.models.user.User
+import ipca.example.bookbox.models.Book
+import ipca.example.bookbox.models.Review
+import ipca.example.bookbox.models.User
 
 
 data class ProfileViewState(

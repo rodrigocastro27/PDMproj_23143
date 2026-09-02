@@ -1,4 +1,4 @@
-package ipca.example.bookbox.models.progress
+package ipca.example.bookbox.models
 
 
 import androidx.room.Dao

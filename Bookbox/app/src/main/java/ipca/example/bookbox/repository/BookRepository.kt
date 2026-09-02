@@ -5,8 +5,8 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import ipca.example.bookbox.api.data.BookApiService
 import ipca.example.bookbox.api.data.BookItem
-import ipca.example.bookbox.models.book.Book
-import ipca.example.bookbox.models.book.BookDao
+import ipca.example.bookbox.models.Book
+import ipca.example.bookbox.models.BookDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -22,15 +22,15 @@ class BookRepository @Inject constructor(
     private val bookDao: BookDao
 ) {
     fun fetchExploreBooks(query: String): Flow<ResultWrapper<List<Book>>> = flow {
-    try {
-        emit(ResultWrapper.Loading())
-        val response = apiService.searchBooks(query = query, maxResults = 50)
-        val books = response.items?.map { it.toBook() } ?: emptyList()
-        emit(ResultWrapper.Success(books))
-    } catch (e: Exception) {
-        emit(ResultWrapper.Error(e.localizedMessage ?: "API Error"))
-    }
-}.flowOn(Dispatchers.IO)
+        try {
+            emit(ResultWrapper.Loading())
+            val response = apiService.searchBooks(query = query, maxResults = 50)
+            val books = response.items?.map { it.toBook() } ?: emptyList()
+            emit(ResultWrapper.Success(books))
+        } catch (e: Exception) {
+            emit(ResultWrapper.Error(e.localizedMessage ?: "API Error"))
+        }
+    }.flowOn(Dispatchers.IO)
 
     fun fetchUserBooks(): Flow<ResultWrapper<List<Book>>> = flow {
         val currentUserId = Firebase.auth.currentUser?.uid

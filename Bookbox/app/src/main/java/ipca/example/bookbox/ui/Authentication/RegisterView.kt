@@ -30,7 +30,7 @@ fun RegisterView(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: AuthenticationViewModel = hiltViewModel()
+    val viewModel: RegisterViewModel = hiltViewModel()
     val uiState by viewModel.uiState
     val context = LocalContext.current
 

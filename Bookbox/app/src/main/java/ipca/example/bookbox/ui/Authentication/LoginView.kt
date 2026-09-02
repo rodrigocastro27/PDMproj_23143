@@ -18,14 +18,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import ipca.example.bookbox.R
+import ipca.example.bookbox.ui.components.Screen
 
 @Composable
 fun LoginView(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: AuthenticationViewModel = hiltViewModel()
+    val viewModel: LoginViewModel = hiltViewModel()
     val uiState by viewModel.uiState
 
 
@@ -33,7 +36,13 @@ fun LoginView(
 
 
     LaunchedEffect(Unit) {
-        viewModel.resetState()
+        if (Firebase.auth.currentUser != null) {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true}
+            }
+        } else {
+            viewModel.resetState()
+        }
     }
 
     Box(
@@ -96,8 +105,8 @@ fun LoginView(
                 )
 
                 TextButton(
-                    onClick = { navController.navigate("forgot_password") },
-                    modifier = Modifier.align(Alignment.End)
+                        onClick = { navController.navigate(Screen.ForgotPassword.route) },
+                        modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(
                         text = "Forgot Password?",
@@ -119,8 +128,8 @@ fun LoginView(
                 Button(
                     onClick = {
                         viewModel.login {
-                            navController.navigate("home") {
-                                popUpTo("login") { inclusive = true }
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
                             }
                         }
                     },
@@ -136,7 +145,7 @@ fun LoginView(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Don't have an account?")
-                    TextButton(onClick = { navController.navigate("register") }) {
+                    TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
                         Text("Create Account", fontWeight = FontWeight.Bold)
                     }
                 }

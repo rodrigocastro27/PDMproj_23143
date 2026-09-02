@@ -1,15 +1,19 @@
 package ipca.example.bookbox.repository
 
-
-import com.google.api.Authentication
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import ipca.example.bookbox.models.book.Book
-import ipca.example.bookbox.models.review.Review
-import ipca.example.bookbox.models.user.User
+import ipca.example.bookbox.models.Book
+import ipca.example.bookbox.models.BookDao
+import ipca.example.bookbox.models.Review
+import ipca.example.bookbox.models.ReviewDao
+import ipca.example.bookbox.models.User
+import ipca.example.bookbox.models.UserDao
+import ipca.example.bookbox.models.WishlistItem
+import ipca.example.bookbox.models.WishlistItemDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
@@ -18,7 +22,11 @@ import javax.inject.Singleton
 
 @Singleton
 class ProfileRepository @Inject constructor(
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val userDao: UserDao,
+    private val reviewDao: ReviewDao,
+    private val wishlistDao: WishlistItemDao,
+    private val bookDao: BookDao
 ) {
 
     fun fetchProfile(uid: String): Flow<ResultWrapper<User>> = flow {
@@ -26,70 +34,76 @@ class ProfileRepository @Inject constructor(
             emit(ResultWrapper.Loading())
             db.collection("users").document(uid).snapshotFlow().collect { snapshot ->
                 val user = snapshot.toObject(User::class.java) ?: User(userid = uid)
+                userDao.insertUser(user)
                 emit(ResultWrapper.Success(user))
             }
         } catch (e: Exception) {
-            emit(ResultWrapper.Error(e.localizedMessage ?: "Erro ao carregar perfil"))
+            val cached = userDao.getUserById(uid)
+            if (cached != null) emit(ResultWrapper.Success(cached))
+            else emit(ResultWrapper.Error(e.localizedMessage ?: "Erro ao carregar perfil"))
         }
     }.flowOn(Dispatchers.IO)
-
 
     fun fetchWishlist(uid: String): Flow<ResultWrapper<List<Book>>> = flow {
         try {
             emit(ResultWrapper.Loading())
-
-            db.collection("users").document(uid)
-                .collection("wishlist")
-                .snapshotFlow()
-                .collect { snapshot ->
-                    val books = snapshot.toObjects(Book::class.java)
-                    emit(ResultWrapper.Success(books))
+            db.collection("users").document(uid).collection("wishlist").snapshotFlow().collect { snapshot ->
+                val books = snapshot.toObjects(Book::class.java)
+                books.forEach { book ->
+                    bookDao.insertBook(book)
+                    wishlistDao.insertWishlist(
+                        WishlistItem(wishlistid = "${uid}_${book.bookid}", userid = uid, bookid = book.bookid, addedDate = System.currentTimeMillis())
+                    )
                 }
+                emit(ResultWrapper.Success(books))
+            }
         } catch (e: Exception) {
-            emit(ResultWrapper.Error(e.localizedMessage ?: "Erro na Wishlist"))
+            val items = wishlistDao.getMyWishlist(uid).first()
+            val cachedBooks = items.mapNotNull { bookDao.getBookById(it.bookid ?: "") }
+            if (cachedBooks.isNotEmpty()) emit(ResultWrapper.Success(cachedBooks))
+            else emit(ResultWrapper.Error(e.localizedMessage ?: "Erro na Wishlist"))
         }
     }.flowOn(Dispatchers.IO)
-
 
     fun addReview(review: Review): Flow<ResultWrapper<Unit>> = flow {
         try {
             emit(ResultWrapper.Loading())
             db.collection("reviews").document(review.reviewid).set(review).await()
+            reviewDao.insertReview(review)
             emit(ResultWrapper.Success(Unit))
         } catch (e: Exception) {
             emit(ResultWrapper.Error(e.localizedMessage ?: "Erro ao gravar review"))
         }
     }.flowOn(Dispatchers.IO)
 
-
     fun fetchUserReviews(uid: String): Flow<ResultWrapper<List<Review>>> = flow {
         try {
             emit(ResultWrapper.Loading())
-            db.collection("reviews")
-                .whereEqualTo("userid", uid)
-                .snapshotFlow()
-                .collect { snapshot ->
-                    val reviews = snapshot.toObjects(Review::class.java)
-                    emit(ResultWrapper.Success(reviews))
-                }
+            db.collection("reviews").whereEqualTo("userid", uid).snapshotFlow().collect { snapshot ->
+                val reviews = snapshot.toObjects(Review::class.java)
+                reviews.forEach { reviewDao.insertReview(it) }
+                emit(ResultWrapper.Success(reviews))
+            }
         } catch (e: Exception) {
-            emit(ResultWrapper.Error(e.localizedMessage ?: "Erro nas reviews"))
+            val cached = reviewDao.getReviewsByUser(uid).first()
+            if (cached.isNotEmpty()) emit(ResultWrapper.Success(cached))
+            else emit(ResultWrapper.Error(e.localizedMessage ?: "Erro nas reviews"))
         }
     }.flowOn(Dispatchers.IO)
-
 
     fun addToWishlist(uid: String, book: Book): Flow<ResultWrapper<Unit>> = flow {
         try {
             emit(ResultWrapper.Loading())
-            db.collection("users").document(uid)
-                .collection("wishlist").document(book.bookid).set(book).await()
+            db.collection("users").document(uid).collection("wishlist").document(book.bookid).set(book).await()
+            bookDao.insertBook(book)
+            wishlistDao.insertWishlist(
+                WishlistItem(wishlistid = "${uid}_${book.bookid}", userid = uid, bookid = book.bookid, addedDate = System.currentTimeMillis())
+            )
             emit(ResultWrapper.Success(Unit))
         } catch (e: Exception) {
             emit(ResultWrapper.Error(e.localizedMessage ?: "Erro ao adicionar"))
         }
     }.flowOn(Dispatchers.IO)
-
-
 
     fun updateProfile(uid: String, updates: Map<String, Any>): Flow<ResultWrapper<Unit>> = flow {
         try {
@@ -97,24 +111,19 @@ class ProfileRepository @Inject constructor(
             db.collection("users").document(uid).update(updates).await()
             emit(ResultWrapper.Success(Unit))
         } catch (e: Exception) {
-            emit(ResultWrapper.Error(e.localizedMessage ?: "Error updating the profile" ))
+            emit(ResultWrapper.Error(e.localizedMessage ?: "Error updating the profile"))
         }
     }.flowOn(Dispatchers.IO)
-
 
     fun updateAccountSettings(uid: String, username: String, email: String): Flow<ResultWrapper<Unit>> = flow {
         try {
             emit(ResultWrapper.Loading())
-            db.collection("users").document(uid).update(
-                "username", username,
-                "email", email
-            ).await()
+            db.collection("users").document(uid).update("username", username, "email", email).await()
             emit(ResultWrapper.Success(Unit))
         } catch (e: Exception) {
             emit(ResultWrapper.Error(e.localizedMessage ?: "Error updating the account"))
         }
     }.flowOn(Dispatchers.IO)
-
 
     fun deleteUserAccount(uid: String): Flow<ResultWrapper<Unit>> = flow {
         try {
@@ -127,18 +136,13 @@ class ProfileRepository @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-
     fun updatePassword(newPassword: String): Flow<ResultWrapper<Unit>> = flow {
         try {
             emit(ResultWrapper.Loading())
-            val user = Firebase.auth.currentUser
-            user?.updatePassword(newPassword)?.await()
+            Firebase.auth.currentUser?.updatePassword(newPassword)?.await()
             emit(ResultWrapper.Success(Unit))
         } catch (e: Exception) {
             emit(ResultWrapper.Error(e.localizedMessage ?: "Error changing password"))
         }
     }.flowOn(Dispatchers.IO)
-
-
 }
-
