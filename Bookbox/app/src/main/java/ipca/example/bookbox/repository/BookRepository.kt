@@ -24,7 +24,7 @@ class BookRepository @Inject constructor(
     fun fetchExploreBooks(query: String): Flow<ResultWrapper<List<Book>>> = flow {
         try {
             emit(ResultWrapper.Loading())
-            val response = apiService.searchBooks(query = query, maxResults = 20)
+            val response = apiService.searchBooks(query = query, maxResults = 240)
             val books = response.items?.map { it.toBook() } ?: emptyList()
             emit(ResultWrapper.Success(books))
         } catch (e: Exception) {
@@ -42,7 +42,8 @@ class BookRepository @Inject constructor(
                 .snapshotFlow()
                 .collect { snapshot ->
                     val books = snapshot.documents.mapNotNull { doc ->
-                        doc.toObject(Book::class.java)?.apply { if (bookid.isEmpty()) bookid = doc.id }
+                        doc.toObject(Book::class.java)
+                            ?.apply { if (bookid.isEmpty()) bookid = doc.id }
                     }
                     books.forEach { bookDao.insertBook(it) }
                     emit(ResultWrapper.Success(books))
@@ -90,24 +91,6 @@ class BookRepository @Inject constructor(
         }
     }
 
-    fun addToWishlist(book: Book): Flow<ResultWrapper<Unit>> = flow {
-        try {
-            emit(ResultWrapper.Loading())
-            val userId = Firebase.auth.currentUser?.uid ?: throw Exception("Login required")
-            db.collection("users").document(userId).collection("wishlist").document(book.bookid).set(book).await()
-            emit(ResultWrapper.Success(Unit))
-        } catch (e: Exception) { emit(ResultWrapper.Error(e.localizedMessage ?: "Wishlist Error")) }
-    }.flowOn(Dispatchers.IO)
-
-    fun saveReview(bookId: String, rating: Int, comment: String): Flow<ResultWrapper<Unit>> = flow {
-        try {
-            emit(ResultWrapper.Loading())
-            val userId = Firebase.auth.currentUser?.uid ?: throw Exception("Login required")
-            val reviewData = mapOf("userId" to userId, "rating" to rating, "comment" to comment, "timestamp" to System.currentTimeMillis())
-            db.collection("books").document(bookId).collection("reviews").document(userId).set(reviewData).await()
-            emit(ResultWrapper.Success(Unit))
-        } catch (e: Exception) { emit(ResultWrapper.Error(e.localizedMessage ?: "Error review")) }
-    }.flowOn(Dispatchers.IO)
 }
 
 fun BookItem.toBook(): Book = Book(
